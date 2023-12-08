@@ -1,0 +1,6 @@
+
+# Carpeta de archivos estaticos
+__pycache__
+
+# Configuracioens para el servidor
+config.py
