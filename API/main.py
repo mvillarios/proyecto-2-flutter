@@ -170,18 +170,18 @@ def login_usuario(usuario: UsuarioLogin):
 """Publicaciones"""
 #Funcion que crea una publicacion
 @app.post("/publicaciones")
-def crear_publicacion(publicacion: Publicacion):
-
-    usuario_creador = usuarios_collection.find_one({"_id": ObjectId(publicacion.idCreador)})
-    if usuario_creador is None:
-        raise HTTPException(status_code=404, detail="El usuario no existe")
+def crear_publicacion(
+    publicacion: Publicacion,
+    current_user: dict = Depends(get_current_user)    
+):
 
     resultado = publicaciones_collection.insert_one({
         "sector": publicacion.sector,
         "descripcion": publicacion.descripcion,
+        "fecha": publicacion.fecha,
         "imagen1": publicacion.imagen1,
         "imagen2": publicacion.imagen2,
-        "idCreador": publicacion.idCreador
+        "idCreador": str(current_user["_id"])
     })
 
     return JSONResponse({
@@ -244,11 +244,10 @@ def eliminar_publicacion(publicacion_id: str = Path(..., description="ID publica
 """Comentarios"""
 #Funcion que crea un comentario
 @app.post("/comentarios")
-def crear_comentario(comentario: Comentario):
-
-    usuario_creador = usuarios_collection.find_one({"_id": ObjectId(comentario.idCreador)})
-    if usuario_creador is None:
-        raise HTTPException(status_code=404, detail="El usuario no existe")
+def crear_comentario(
+    comentario: Comentario,
+    current_user: dict = Depends(get_current_user)    
+):
 
     publicacion = publicaciones_collection.find_one({"_id": ObjectId(comentario.idPublicacion)})
     if publicacion is None:
@@ -256,7 +255,7 @@ def crear_comentario(comentario: Comentario):
 
     resultado = comentarios_collection.insert_one({
         "comentario": comentario.comentario,
-        "idCreador": comentario.idCreador,
+        "idCreador": str(current_user["_id"]),
         "idPublicacion": comentario.idPublicacion
     })
 
@@ -320,11 +319,10 @@ def eliminar_comentario(comentario_id: str = Path(..., description="ID comentari
 """Reacciones"""
 #Funcion que crea una reaccion
 @app.post("/reacciones")
-def crear_reaccion(reaccion: Reaccion):
-
-    usuario_creador = usuarios_collection.find_one({"_id": ObjectId(reaccion.idCreador)})
-    if usuario_creador is None:
-        raise HTTPException(status_code=404, detail="El usuario no existe")
+def crear_reaccion(
+    reaccion: Reaccion,
+    current_user: dict = Depends(get_current_user)
+):
 
     publicacion = publicaciones_collection.find_one({"_id": ObjectId(reaccion.idPublicacion)})
     if publicacion is None:
@@ -332,7 +330,7 @@ def crear_reaccion(reaccion: Reaccion):
 
     resultado = reacciones_collection.insert_one({
         "tipo": reaccion.tipo,
-        "idCreador": reaccion.idCreador,
+        "idCreador": str(current_user["_id"]),
         "idPublicacion": reaccion.idPublicacion
     })
 

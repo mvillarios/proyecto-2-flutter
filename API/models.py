@@ -12,6 +12,7 @@ class UsuarioLogin(BaseModel):
 class Publicacion(BaseModel):
     sector: str # nombre sector
     descripcion: str # descripcion de la publicacion
+    fecha: str # fecha de la publicacion
     imagen1: str 
     imagen2: str 
     idCreador: str # id de usuario
