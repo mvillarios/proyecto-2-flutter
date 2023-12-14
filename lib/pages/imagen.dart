@@ -31,7 +31,7 @@ class PaginaDetalleImagen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context); // Volver a la página de detalle
                 },
-                child: const Text('Volver al Detalle'),
+                child: const Text('Volver'),
               ),
               const SizedBox(height: 10),
             ],

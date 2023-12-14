@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -144,56 +146,68 @@ class _HomeState extends State<Home> {
                   } else{
                     final nombreCreador = snapshot.data ?? '';
                     final fecha = publicacion['fecha'];
-                    return ListTile(
-                      title: Text(publicacion['sector']),
-                      subtitle: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: RichText(
-                              textAlign: TextAlign.left,
-                              text: TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'por ',
-                                    style: TextStyle(
-                                      color: Colors.black, // Puedes personalizar el color si es necesario
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      color: Colors.white,
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
+                        title: Text(
+                          publicacion['sector'],
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                        subtitle: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: RichText(
+                                textAlign: TextAlign.left,
+                                text: TextSpan(
+                                  children: [
+                                    const TextSpan(
+                                      text: 'por ',
+                                      style: TextStyle(
+                                        color: Colors.black, // Puedes personalizar el color si es necesario
+                                      ),
                                     ),
-                                  ),
-                                  TextSpan(
-                                    text: nombreCreador,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black, // Puedes personalizar el color si es necesario
+                                    TextSpan(
+                                      text: nombreCreador,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black, // Puedes personalizar el color si es necesario
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              '$fecha',
-                              textAlign: TextAlign.right,
+                            Expanded(
+                              child: Text(
+                                '$fecha',
+                                textAlign: TextAlign.right,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        onTap: (){
+                          Navigator.pushReplacementNamed(
+                            context,
+                            '/detalle',
+                            arguments: {
+                              '_id': publicacion['_id'],
+                              'sector': publicacion['sector'],
+                              'descripcion': publicacion['descripcion'],
+                              'fecha': publicacion['fecha'],
+                              'imagen1': publicacion['imagen1'],
+                              'imagen2': publicacion['imagen2'],
+                              'nombreCreador': nombreCreador,
+                            },
+                          );
+                        },
+                        
                       ),
-                      onTap: (){
-                        Navigator.pushReplacementNamed(
-                          context,
-                          '/detalle',
-                          arguments: {
-                            '_id': publicacion['_id'],
-                            'sector': publicacion['sector'],
-                            'descripcion': publicacion['descripcion'],
-                            'fecha': publicacion['fecha'],
-                            'imagen1': publicacion['imagen1'],
-                            'imagen2': publicacion['imagen2'],
-                            'nombreCreador': nombreCreador,
-                          },
-                        );
-                      },
                     );
                   }
                 },

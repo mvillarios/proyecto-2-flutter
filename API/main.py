@@ -13,7 +13,7 @@ from passlib.context import CryptContext
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 
-from models import Usuario, Publicacion, Comentario, Reaccion, UsuarioLogin, TokenData
+from models import Usuario, Publicacion, Comentario, Reaccion, UsuarioLogin, TokenData, CambiarReaccion
 from config import MONGODB_URI, SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 app = FastAPI()
@@ -297,6 +297,20 @@ def obtener_comentario(comentario_id: str = Path(..., description="ID comentario
         "comentario": comentario
     }, status_code=200)
 
+# Funcion que obtiene todos los comentarios de una publicacion
+@app.get("/comentarios/publicacion/{publicacion_id}")
+def obtener_comentarios_publicacion(publicacion_id: str = Path(..., description="ID publicacion")):
+    # Buscar los comentarios de la publicacion
+    comentarios = list(comentarios_collection.find({"idPublicacion": publicacion_id}))
+    
+    for comentario in comentarios:
+        comentario["_id"] = str(comentario["_id"])
+
+    return JSONResponse({
+        "message": "Comentarios obtenidos exitosamente",
+        "comentarios": comentarios
+    }, status_code=200)
+
 # Funcion que elimina un comentario por su id
 @app.delete("/comentarios/{comentario_id}")
 def eliminar_comentario(comentario_id: str = Path(..., description="ID comentario")):
@@ -372,6 +386,62 @@ def obtener_reaccion(reaccion_id: str = Path(..., description="ID reaccion")):
         "reaccion": reaccion
     }, status_code=200)
 
+# Funcion que obtiene todas las reacciones de una publicacion
+@app.get("/reacciones/publicacion/{publicacion_id}")
+def obtener_reacciones_publicacion(publicacion_id: str = Path(..., description="ID publicacion")):
+    # Buscar las reacciones de la publicacion
+    reacciones = list(reacciones_collection.find({"idPublicacion": publicacion_id}))
+    
+    for reaccion in reacciones:
+        reaccion["_id"] = str(reaccion["_id"])
+
+    return JSONResponse({
+        "message": "Reacciones obtenidas exitosamente",
+        "reacciones": reacciones
+    }, status_code=200)
+
+# Funcion que obtiene la reaccion del current_user de una publicacion
+@app.get("/reaccion/usuario/{publicacion_id}")
+def obtener_reaccion_usuario(
+    publicacion_id: str = Path(..., description="ID publicacion"), 
+    current_user: dict = Depends(get_current_user)
+):
+    # Buscar la reaccion del current_user de la publicacion
+    reaccion = reacciones_collection.find_one({"idPublicacion": publicacion_id, "idCreador": str(current_user["_id"])})
+    
+    if reaccion is None:
+        raise HTTPException(status_code=404, detail="La reaccion no existe")
+    
+    # Convertir el ObjectId de vuelta a cadena para la respuesta JSON
+    reaccion["_id"] = str(reaccion["_id"])
+
+    return JSONResponse({
+        "message": "Reaccion obtenida exitosamente",
+        "reaccion": reaccion
+    }, status_code=200)
+
+# Funcion que modifica una reaccion por su id
+@app.put("/reacciones/{reaccion_id}")
+def modificar_reaccion(
+    reaccionCambiada: CambiarReaccion,
+    reaccion_id: str = Path(..., description="ID reaccion"),
+):
+    # Convertir el ID de cadena a ObjectId
+    reaccionObjectId = ObjectId(reaccion_id)
+    
+    # Buscar la reaccion por ObjectId
+    reaccionBuscada = reacciones_collection.find_one({"_id": reaccionObjectId})
+
+    if reaccionBuscada is None:
+        raise HTTPException(status_code=404, detail="La reaccion no existe")
+    
+    # Modificar la reaccion
+    reacciones_collection.update_one({"_id": reaccionObjectId}, {"$set": {"tipo": reaccionCambiada.tipo}})
+
+    return JSONResponse({
+        "message": "Reaccion modificada exitosamente"
+    }, status_code=200)
+
 # Funcion que elimina una reaccion por su id
 @app.delete("/reacciones/{reaccion_id}")
 def eliminar_reaccion(reaccion_id: str = Path(..., description="ID reaccion")):
@@ -390,3 +460,4 @@ def eliminar_reaccion(reaccion_id: str = Path(..., description="ID reaccion")):
     return JSONResponse({
         "message": "Reaccion eliminada exitosamente"
     }, status_code=200)
+

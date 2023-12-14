@@ -27,5 +27,8 @@ class Reaccion(BaseModel):
     idCreador: str # id de usuario
     idPublicacion: str # id de publicacion
 
+class CambiarReaccion(BaseModel):
+    tipo: bool # tipo de reaccion
+
 class TokenData(BaseModel):
     username: str | None = None

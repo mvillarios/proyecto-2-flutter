@@ -359,6 +359,30 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Comentarios Publicacion",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/comentarios/publicacion/65739ebce30eb6f4c5dd7e78",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"comentarios",
+								"publicacion",
+								"65739ebce30eb6f4c5dd7e78"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -368,11 +392,21 @@
 				{
 					"name": "Crear reaccion",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtdmlsbGEiLCJleHAiOjE3MDI1MjAyOTh9.tQzEURlvV7Y0-X-YDD7A_Nbeg7bwNv3ZdAbH9wjBYIg",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"tipo\": 0,\r\n    \"idCreador\": \"65739c4a5e45be9cfe8182ef\",\r\n    \"idPublicacion\": \"65739ebce30eb6f4c5dd7e78\"\r\n}",
+							"raw": "{\r\n    \"tipo\": 1,\r\n    \"idCreador\": \"657509ef90a44ddbd3c0d0f5\",\r\n    \"idPublicacion\": \"65739ebce30eb6f4c5dd7e78\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -459,6 +493,54 @@
 							"path": [
 								"reacciones",
 								"65739f76e30eb6f4c5dd7e7b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reacciones Publicacion",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/reacciones/publicacion/65739ebce30eb6f4c5dd7e78",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"reacciones",
+								"publicacion",
+								"65739ebce30eb6f4c5dd7e78"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reacciones usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/reacciones/usuario/65739c4a5e45be9cfe8182ef",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"reacciones",
+								"usuario",
+								"65739c4a5e45be9cfe8182ef"
 							]
 						}
 					},

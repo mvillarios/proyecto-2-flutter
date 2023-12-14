@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class ApiService{
 
-  static const urlBase = 'https://fe1c-2800-150-107-db6-442a-e7b6-6e3b-8d58.ngrok-free.app';
+  static const urlBase = 'https://dbc2-2800-150-107-db6-c863-4cf8-34a5-62be.ngrok-free.app';
 
   static Future<dynamic> registro(String username, String password, String email) async{
     
@@ -191,6 +191,24 @@ class ApiService{
     }
   }
 
+  // Funcion que obtiene todos los comentarios de una publicacion
+  static Future<dynamic> comentariosPublicacion(String idPublicacion) async{
+    final response = await http.get(
+      Uri.parse('$urlBase/comentarios/publicacion/$idPublicacion'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if(response.statusCode == 200){
+      // print(jsonDecode(response.body));
+      return jsonDecode(response.body);
+    }else{
+      // recibir el mensaje
+      return jsonDecode(response.body)['detail'];
+    }
+  }
+
   // Reacciones
   static Future<dynamic> crearReaccion(bool tipo, String idPublicacion, String token) async{
     final response = await http.post(
@@ -201,7 +219,8 @@ class ApiService{
       },
       body: jsonEncode(<String,dynamic>{
         'tipo': tipo,
-        'idPublicacion': idPublicacion,
+        'idCreador': '',
+        'idPublicacion': idPublicacion
       }),
     );
 
@@ -231,6 +250,83 @@ class ApiService{
 
   static Future<dynamic> reaccionId(String id) async{
     final response = await http.get(
+      Uri.parse('$urlBase/reacciones/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if(response.statusCode == 200){
+      return jsonDecode(response.body);
+    }else{
+      // recibir el mensaje
+      return jsonDecode(response.body)['detail'];
+    }
+  }
+
+
+  // Funcion que obtiene todas las reacciones de una publicacion
+  static Future<dynamic> reaccionesPublicacion(String idPublicacion) async{
+    final response = await http.get(
+      Uri.parse('$urlBase/reacciones/publicacion/$idPublicacion'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if(response.statusCode == 200){
+      // print(jsonDecode(response.body));
+      return jsonDecode(response.body);
+    }else{
+      // recibir el mensaje
+      return jsonDecode(response.body)['detail'];
+    }
+  }
+
+  // Funcion que obtiene todas las reacciones de un usuario
+  static Future<dynamic> reaccionUsuario(String token, String idPublicacion) async{
+    final response = await http.get(
+      Uri.parse('$urlBase/reaccion/usuario/$idPublicacion'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if(response.statusCode == 200){
+      // print(jsonDecode(response.body));
+      return jsonDecode(response.body);
+    }else{
+      // recibir el mensaje
+      return jsonDecode(response.body)['detail'];
+    }
+  }
+
+
+  // Funcion que modifica una reaccion por su id
+  static Future<dynamic> modificarReaccion(String id, bool tipo) async{
+    final response = await http.put(
+      Uri.parse('$urlBase/reacciones/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String,dynamic>{
+        'tipo': tipo,
+      }),
+    );
+
+    if(response.statusCode == 200){
+      // print(jsonDecode(response.body));
+      return jsonDecode(response.body);
+    }else{
+      // recibir el mensaje
+      return jsonDecode(response.body)['detail'];
+    }
+  }
+
+  // Eliminar reaccion
+  static Future<dynamic> eliminarReaccion(String id) async{
+    final response = await http.delete(
       Uri.parse('$urlBase/reacciones/$id'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
