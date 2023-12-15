@@ -4,6 +4,7 @@ import 'dart:convert';
 class ApiService{
 
   static const urlBase = 'https://dbc2-2800-150-107-db6-c863-4cf8-34a5-62be.ngrok-free.app';
+  // static const urlBase = 'http://10.0.2.2:8000';
 
   static Future<dynamic> registro(String username, String password, String email) async{
     
@@ -19,11 +20,16 @@ class ApiService{
       }),
     );
 
-    if(response.statusCode == 201){
-      return jsonDecode(response.body);
-    }else{
-      return jsonDecode(response.body)['detail'];
-    }
+    try {
+      if(response.statusCode == 201){
+        return jsonDecode(response.body);
+      }else{
+        return jsonDecode(response.body)['detail'];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+}
   }
 
   static Future<dynamic> login(String username, String password) async{
@@ -138,7 +144,7 @@ class ApiService{
   }
 
   // Comentarios
-  static Future<dynamic> crearComentario(String comentario, String idPublicacion, String token) async{
+  static Future<dynamic> crearComentario(String comentario, String idPublicacion, String idCreador, String token) async{
     final response = await http.post(
       Uri.parse('$urlBase/comentarios'),
       headers: <String, String>{
@@ -148,6 +154,7 @@ class ApiService{
       body: jsonEncode(<String,dynamic>{
         'comentario': comentario,
         'idPublicacion': idPublicacion,
+        'idCreador': idCreador,
       }),
     );
 

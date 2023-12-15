@@ -125,6 +125,42 @@ class _DetalleState extends State<Detalle> {
     }
   }
 
+  // Añadir comentarios
+  void showAddCommentDialog(BuildContext context, String idPublicacion, String idCreador, String token) {
+    final comentarioInputController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¡Añade un comentario!'),
+          content: TextField(
+            controller: comentarioInputController,
+            decoration: const InputDecoration(hintText: "Ingresa tu comentario"),
+          ),
+          actions: [
+            ValueListenableBuilder(
+              valueListenable: comentarioInputController,
+              builder: (context, value, child) {
+                return TextButton(
+                  onPressed: comentarioInputController.text.isEmpty
+                      ? null
+                      : () async {
+                          var result = await ApiService.crearComentario(
+                              comentarioInputController.text, idPublicacion, idCreador, token);
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        },
+                  child: const Text('Enviar'),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Uint8List base64StringToBytes(String base64String) {
     return base64.decode(base64String);
   }
@@ -155,12 +191,15 @@ class _DetalleState extends State<Detalle> {
   Widget build(BuildContext context) {
     final Map<String, dynamic>? args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
+    final String idPublicacion = args?['_id'] ?? '';
     final String sector = args?['sector'] ?? '';
     final String descripcion = args?['descripcion'] ?? '';
     final String fecha = args?['fecha'] ?? '';
     final String imagen1 = args?['imagen1'] ?? '';
     final String imagen2 = args?['imagen2'] ?? '';
     final String nombreCreador = args?['nombreCreador'] ?? '';
+
+    debugPrint('idPublicacion: $idPublicacion');
 
     return Scaffold(
       appBar: AppBar(
@@ -390,7 +429,17 @@ class _DetalleState extends State<Detalle> {
                 ],
               ),
             ),
-            
+            Container(
+              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+              child: ElevatedButton(
+                onPressed: () => showAddCommentDialog(context, idPublicacion, nombreCreador, Global.token),
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 40)),
+                ),
+                child: const Text('Añadir comentario'),
+              ),
+            ),
+            const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
               child: ElevatedButton(
