@@ -148,6 +148,9 @@ class _DetalleState extends State<Detalle> {
                       : () async {
                           var result = await ApiService.crearComentario(
                               comentarioInputController.text, idPublicacion, idCreador, token);
+                          if (result['message'] == 'Comentario creado exitosamente') { 
+                            setState(() {}); // Recargar la página para mostrar el comentario
+                          }
                           // ignore: use_build_context_synchronously
                           Navigator.of(context).pop();
                         },
@@ -439,22 +442,77 @@ class _DetalleState extends State<Detalle> {
                 child: const Text('Añadir comentario'),
               ),
             ),
-            const SizedBox(height: 20),
-            Container(
-              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-              child: ElevatedButton(
-                onPressed: (){
-                  Navigator.pushReplacementNamed(context, '/home');
-                },
-                style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 40)),
-                ),
-                child: const Text('Volver'),
+            const SizedBox(height: 10),
+            const Center(
+              child: Text(
+                'Comentarios', 
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), 
+                textAlign: TextAlign.center,
               ),
-            )
+            ),
+            const SizedBox(height: 10),
+            FutureBuilder<dynamic>(
+              future: ApiService.comentariosPublicacion(idPublicacion),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator(); // Show a loading spinner while waiting
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}'); // Show an error message if something went wrong
+                } else {
+                  var comentarios = snapshot.data['comentarios'];
+                  if (comentarios.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Todavía no hay comentarios',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    );
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(), // Permite hacer scroll con el resto de la página
+                      itemCount: comentarios.length,
+                      itemBuilder: (context, index) {
+                        var comment = comentarios[index];
+                        return FutureBuilder<dynamic>(
+                          future: ApiService.usurioId(comment['idCreador']),
+                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircularProgressIndicator(); // Show a loading spinner while waiting
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}'); // Show an error message if something went wrong
+                            } else {
+                              var username = snapshot.data['usuario']['username'];
+                              return ListTile(
+                                title: Text(comment['comentario']),
+                                subtitle: Text('por @$username'),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    );
+                  }
+                }
+              },
+            ),
+            
           ],
         ),
       ),
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        child: ElevatedButton(
+          onPressed: (){
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+          style: ButtonStyle(
+            minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 40)),
+          ),
+          child: const Text('Volver'),
+        ),
+      ),
     );
+    
   }
 }
